@@ -23,6 +23,21 @@ class TaskViewModel extends EventViewModel {
      _repository.addTask(Task(1, title, description, false));
      notify(LoadingEvent(isLoading: false));
   }
+
+  void addMessage(String _message) {
+     notify(LoadingEvent(isLoading: true));
+     // ... code to create the task
+     _repository.sendMessage(Message(1, _message));
+     notify(LoadingEvent(isLoading: false));
+  }
+
+    void loadMessages() {
+    notify(LoadingEvent(isLoading: true));
+    _repository.loadMessages().then((value) {
+      notify(MessagesLoadedEvent(messages: value));
+      notify(LoadingEvent(isLoading: false));
+    });
+  }
 }
 
 class LoadingEvent extends ViewEvent {
@@ -35,6 +50,12 @@ class TasksLoadedEvent extends ViewEvent {
   final List<Task> tasks;
 
   TasksLoadedEvent({required this.tasks}) : super("TasksLoadedEvent");
+}
+
+class MessagesLoadedEvent extends ViewEvent {
+  final List<Message> messages;
+
+  MessagesLoadedEvent({required this.messages}) : super("MessagesLoadedEvent");
 }
 
 // should be emitted when 

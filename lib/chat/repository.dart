@@ -4,7 +4,7 @@ class TaskRepository {
   final List<Task> _taskList = [
     Task(
         0,
-        "Study MVVM",
+        "John Doe",
         "In order to avoid ugly state management librares and collect continuously technical debt, I should study proper state management patterns",
         false),
   ];
