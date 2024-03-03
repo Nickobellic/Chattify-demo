@@ -3,7 +3,7 @@ import './chat/ui.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
-  if(!kIsWeb) { // Mobile View
+  if(kIsWeb) { // Mobile View
     runApp(const WebApp());
   } else { // Web View
   runApp(const MyApp());
