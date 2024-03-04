@@ -3,10 +3,16 @@ import './chat/ui.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
-  if(kIsWeb) { // Mobile View
-    runApp(const WebApp());
-  } else { // Web View
-  runApp(const MyApp());
+  runApp(MyApp());
+}
+
+class DeviceFactory {
+  static Widget createUI() {
+    if(kIsWeb) {
+      return const WebAccountListWidget();
+    } else {
+      return const TaskWidget();
+    }
   }
 }
 
@@ -32,7 +38,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:  TaskWidget(),
+      home:   DeviceFactory.createUI(),
     );
   }
 }
