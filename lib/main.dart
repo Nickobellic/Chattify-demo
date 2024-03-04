@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learn_flut/responsive/responsive.dart';
 import './chat/ui.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -8,7 +9,7 @@ void main() {
 
 class DeviceFactory {
   static Widget createUI() {
-    if(kIsWeb) {
+    if (kIsWeb) {
       return const WebAccountListWidget();
     } else {
       return const TaskWidget();
@@ -22,7 +23,10 @@ class WebApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: const Text("Hello World, running on Web", textDirection: TextDirection.ltr,),
+      child: const Text(
+        "Hello World, running on Web",
+        textDirection: TextDirection.ltr,
+      ),
     );
   }
 }
@@ -38,7 +42,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home:   DeviceFactory.createUI(),
+      home: ResponsiveLayout(
+        desktopBody: WebAccountListWidget(),
+        mobileBody: TaskWidget(),
+      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
