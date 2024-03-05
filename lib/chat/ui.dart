@@ -31,6 +31,7 @@ class _WebAccountState extends State<WebAccountListWidget>
 // Consider making TaskRepository() a singleton by using a factory
   final TaskViewModel _viewModel = TaskViewModel(TaskRepository());
   bool _isLoading = false;
+
   List<Task> _tasks = [];
 
   @override
@@ -47,6 +48,8 @@ class _WebAccountState extends State<WebAccountListWidget>
 
   @override
   Widget build(BuildContext context) {
+      double width = MediaQuery.of(context).size.width;
+  double loadPosition = width * 0.35;
     return Scaffold(
         appBar: AppBar(
           title: Text("Chattify (Web)"),
@@ -112,7 +115,10 @@ class _WebAccountState extends State<WebAccountListWidget>
             ),
             _isLoading
                 ? Center(
-                    child: CircularProgressIndicator(),
+                    child:  Padding(
+                      child:  CircularProgressIndicator(),
+                      padding: EdgeInsets.only(left: loadPosition),
+                    )
                   )
                 : Expanded(
                     child: ListView.builder(
