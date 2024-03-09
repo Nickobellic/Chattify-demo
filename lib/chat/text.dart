@@ -78,7 +78,7 @@ class _MyCustomFormState extends State<MyCustomForm> implements EventObserver {
         )),
         Container(
           padding: EdgeInsets.all(16),
-          margin: EdgeInsets.only(top: _paddingTop - 16),
+          alignment: Alignment.bottomCenter,
           child: TextField(
             focusNode: _focusNode,
             controller: myController,

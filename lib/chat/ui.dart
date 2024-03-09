@@ -8,6 +8,19 @@ import './viewmodel.dart';
 import "dm.dart";
 import 'model.dart';
 
+
+// Factory to Switch UI for different Versions
+class ChatPage {
+  static Widget platformSpecificUI(BuildContext context) {
+    if (Theme.of(context).platform == TargetPlatform.android) {
+      return const MyCustomForm(); // Adding 'const' keyword
+    } else {
+      return const MyWebCustomForm(); // Web View Chat page
+    }
+  }
+}
+
+// Android Widget
 class TaskWidget extends StatefulWidget {
   const TaskWidget({super.key});
 
@@ -17,6 +30,87 @@ class TaskWidget extends StatefulWidget {
   }
 }
 
+class _TaskWidgetState extends State<TaskWidget> implements EventObserver {
+// Consider making TaskRepository() a singleton by using a factory
+  final TaskViewModel _viewModel = TaskViewModel(TaskRepository());
+  bool _isLoading = false;
+  List<Task> _tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.subscribe(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _viewModel.unsubscribe(this);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Chattify"),
+          backgroundColor: Colors.blue,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Container(
+          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              FloatingActionButton(
+                onPressed: () {
+                  _viewModel.createTask("New Task", "Hard Coded Tasks tbh");
+                },
+                child: Icon(Icons.add),
+              ),
+              FloatingActionButton(
+                onPressed: () {
+                  _viewModel.loadTasks();
+                },
+                child: Icon(Icons.refresh),
+              ),
+            ],
+          ),
+        ),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                itemCount: _tasks.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_tasks[index].title),
+                    subtitle: Text(_tasks[index].description),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>  ChatPage.platformSpecificUI(context)),
+                    ),
+                  );
+                },
+              ));
+  }
+
+  @override
+  void notify(ViewEvent event) {
+    if (event is LoadingEvent) {
+      setState(() {
+        _isLoading = event.isLoading;
+      });
+    } else if (event is TasksLoadedEvent) {
+      setState(() {
+        _tasks = event.tasks;
+      });
+    }
+  }
+}
+
+// Web Widget
 class WebAccountListWidget extends StatefulWidget {
   const WebAccountListWidget({super.key});
 
@@ -130,10 +224,7 @@ class _WebAccountState extends State<WebAccountListWidget>
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ResponsiveLayout(
-                                      desktopBody: MyWebCustomForm(),
-                                      mobileBody: MyCustomForm(),
-                                    )),
+                                builder: (context) => ChatPage.platformSpecificUI(context)),
                           ),
                         );
                       },
@@ -157,82 +248,4 @@ class _WebAccountState extends State<WebAccountListWidget>
   }
 }
 
-class _TaskWidgetState extends State<TaskWidget> implements EventObserver {
-// Consider making TaskRepository() a singleton by using a factory
-  final TaskViewModel _viewModel = TaskViewModel(TaskRepository());
-  bool _isLoading = false;
-  List<Task> _tasks = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _viewModel.subscribe(this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _viewModel.unsubscribe(this);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Chattify"),
-          backgroundColor: Colors.blue,
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Container(
-          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              FloatingActionButton(
-                onPressed: () {
-                  _viewModel.createTask("New Task", "Hard Coded Tasks tbh");
-                },
-                child: Icon(Icons.add),
-              ),
-              FloatingActionButton(
-                onPressed: () {
-                  _viewModel.loadTasks();
-                },
-                child: Icon(Icons.refresh),
-              ),
-            ],
-          ),
-        ),
-        body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : ListView.builder(
-                itemCount: _tasks.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_tasks[index].title),
-                    subtitle: Text(_tasks[index].description),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MyCustomForm()),
-                    ),
-                  );
-                },
-              ));
-  }
-
-  @override
-  void notify(ViewEvent event) {
-    if (event is LoadingEvent) {
-      setState(() {
-        _isLoading = event.isLoading;
-      });
-    } else if (event is TasksLoadedEvent) {
-      setState(() {
-        _tasks = event.tasks;
-      });
-    }
-  }
-}
